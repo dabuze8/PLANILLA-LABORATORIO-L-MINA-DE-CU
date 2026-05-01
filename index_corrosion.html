@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Corrosión Lámina de Cobre · UMSA PET-212</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117; --bg2:#161b22; --bg3:#21262d; --bg4:#30363d;
+  --border:#30363d; --border2:#484f58;
+  --text:#e6edf3; --text2:#8b949e; --text3:#6e7681;
+  --teal:#3fb950; --teal-bg:rgba(63,185,80,.12); --teal-border:rgba(63,185,80,.3);
+  --blue:#58a6ff; --blue-bg:rgba(88,166,255,.12); --blue-border:rgba(88,166,255,.3);
+  --amber:#f0883e; --amber-bg:rgba(240,136,62,.12); --amber-border:rgba(240,136,62,.3);
+  --red:#f85149; --red-bg:rgba(248,81,73,.12); --red-border:rgba(248,81,73,.3);
+  --purple:#a371f7; --purple-bg:rgba(163,113,247,.12); --purple-border:rgba(163,113,247,.3);
+  --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif;
+  --r:6px; --r2:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh}
+
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:18px 32px;position:sticky;top:0;z-index:100}
+.header-badge{background:var(--blue-bg);border:1px solid var(--blue-border);color:var(--blue);padding:4px 12px;border-radius:20px;font-size:11px;font-family:var(--mono);font-weight:500;white-space:nowrap}
+.header h1{font-size:15px;font-weight:600;color:var(--text)}
+.header p{font-size:12px;color:var(--text2);margin-top:1px}
+
+.container{max-width:1200px;margin:0 auto;padding:24px 32px}
+
+.nav-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2)}
+.pill{background:none;border:1px solid var(--border);color:var(--text2);padding:5px 14px;border-radius:20px;font-size:12px;font-family:var(--mono);cursor:pointer;transition:.15s}
+.pill:hover{border-color:var(--border2);color:var(--text)}
+.pill.active{background:var(--blue-bg);border-color:var(--blue-border);color:var(--blue)}
+
+.section{margin-bottom:32px;scroll-margin-top:80px}
+.section-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.section-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;font-family:var(--mono);flex-shrink:0}
+.section-title{font-size:14px;font-weight:600;color:var(--text)}
+.section-sub{font-size:11px;color:var(--text3);font-family:var(--mono)}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;margin-bottom:12px}
+.card-title{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:12px;font-family:var(--mono)}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+
+.inp-g{display:flex;flex-direction:column;gap:4px}
+.inp-g label{font-size:11px;color:var(--text2);font-family:var(--mono)}
+.inp-g input,.inp-g select{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:var(--r);font-family:var(--mono);font-size:12px;width:100%;transition:.15s}
+.inp-g input:focus,.inp-g select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(88,166,255,.12)}
+.inp-g .hint{font-size:10px;color:var(--text3)}
+
+.mc{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px}
+.mc-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px;font-family:var(--mono)}
+.mc-val{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--blue)}
+.mc-sub{font-size:10px;color:var(--text3);margin-top:3px}
+
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:10px;font-weight:600;font-family:var(--mono)}
+.b-ok{background:var(--teal-bg);border:1px solid var(--teal-border);color:var(--teal)}
+.b-warn{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber)}
+.b-err{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red)}
+
+.preset-btns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.pbtn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:5px 14px;border-radius:20px;font-size:12px;font-family:var(--mono);cursor:pointer;transition:.15s}
+.pbtn:hover{border-color:var(--border2);color:var(--text)}
+.pbtn.act{background:var(--blue-bg);border-color:var(--blue-border);color:var(--blue)}
+
+.tbl-wrap{overflow-x:auto}
+table.dt{width:100%;border-collapse:collapse;font-size:12px}
+table.dt th{background:var(--bg3);color:var(--text2);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:8px 12px;text-align:center;border-bottom:1px solid var(--border);font-family:var(--mono)}
+table.dt td{padding:7px 12px;border-bottom:1px solid var(--border);text-align:center;font-family:var(--mono);color:var(--text)}
+table.dt td.lbl{text-align:left;font-family:var(--sans);color:var(--text2)}
+table.dt tr:last-child td{border-bottom:none}
+table.dt tr.even td{background:rgba(255,255,255,.02)}
+
+.corr-scale{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin:12px 0}
+.corr-item{aspect-ratio:1;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;border:1px solid var(--border);cursor:pointer;transition:.2s}
+.corr-item:hover{transform:scale(1.05)}
+.corr-item.selected{border:2px solid var(--blue);box-shadow:0 0 0 3px var(--blue-bg)}
+
+.color-ref{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.color-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center}
+.color-swatch{height:40px;border-radius:var(--r);margin-bottom:6px}
+.color-name{font-size:10px;font-weight:600;margin-bottom:2px}
+.color-desc{font-size:9px;color:var(--text3)}
+
+footer{border-top:1px solid var(--border);padding:20px 32px;text-align:center;color:var(--text3);font-size:11px;font-family:var(--mono);margin-top:32px}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="header-badge">PET-212</div>
+    <div>
+      <h1>Dashboard · Corrosión a la Lámina de Cobre ASTM D-130</h1>
+      <p>UMSA · Ingeniería Petrolera · Refinación del Petróleo · Ensayo N°3</p>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+<nav class="nav-pills">
+  <button class="pill active" onclick="scrollTo('s1')">1 · Muestra</button>
+  <button class="pill" onclick="scrollTo('s2')">2 · Temperatura y tiempo</button>
+  <button class="pill" onclick="scrollTo('s3')">3 · Evaluación visual</button>
+  <button class="pill" onclick="scrollTo('s4')">4 · Clasificación</button>
+  <button class="pill" onclick="scrollTo('s5')">5 · Resumen</button>
+</nav>
+
+<!-- S1: MUESTRA -->
+<section class="section" id="s1">
+  <div class="section-hdr">
+    <div class="section-num" style="background:var(--blue-bg);border:1px solid var(--blue-border);color:var(--blue)">1</div>
+    <div>
+      <div class="section-title">Identificación de la muestra</div>
+      <div class="section-sub">Seleccionar o ingresar datos de la muestra ensayada</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Cargar muestra predefinida</div>
+    <div class="preset-btns">
+      <button class="pbtn act" onclick="loadPreset('GAS',this)">Gasolina Especial</button>
+      <button class="pbtn" onclick="loadPreset('DIE',this)">Diesel</button>
+      <button class="pbtn" onclick="loadPreset('JET',this)">Jet Fuel</button>
+      <button class="pbtn" onclick="loadPreset('S02',this)">Gas + 0.2g S</button>
+      <button class="pbtn" onclick="loadPreset('S05',this)">Gas + 0.5g S</button>
+      <button class="pbtn" onclick="loadPreset('S10',this)">Gas + 1.0g S</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="g3">
+      <div class="inp-g">
+        <label>Nombre de la muestra</label>
+        <input id="nom" value="Gasolina Especial">
+      </div>
+      <div class="inp-g">
+        <label>Procedencia</label>
+        <input id="proc" value="Estación de servicio">
+      </div>
+      <div class="inp-g">
+        <label>Contenido azufre (g en 10 mL)</label>
+        <input id="azufre" type="number" step="0.1" value="0.0">
+        <div class="hint">0 = muestra original · 0.2, 0.5, 1.0 = dopada</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S2: TEMPERATURA Y TIEMPO -->
+<section class="section" id="s2">
+  <div class="section-hdr">
+    <div class="section-num" style="background:var(--teal-bg);border:1px solid var(--teal-border);color:var(--teal)">2</div>
+    <div>
+      <div class="section-title">Condiciones del ensayo — temperatura y tiempo</div>
+      <div class="section-sub">Según ASTM D-130: gasolina 50°C · diesel/jet fuel 100°C · tiempo 3 horas</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="g4">
+      <div class="inp-g">
+        <label>T baño maría objetivo (°C)</label>
+        <select id="t_obj" onchange="calc()">
+          <option value="50">50 °C (gasolina)</option>
+          <option value="100">100 °C (diesel/jet fuel)</option>
+        </select>
+      </div>
+      <div class="inp-g">
+        <label>T baño maría real (°C)</label>
+        <input id="t_real" type="number" step="0.1" value="50.0" oninput="calc()">
+      </div>
+      <div class="inp-g">
+        <label>Tiempo de inmersión (min)</label>
+        <input id="tiempo" type="number" step="1" value="180" oninput="calc()">
+        <div class="hint">ASTM D-130: 180 minutos (3 horas)</div>
+      </div>
+      <div class="inp-g">
+        <label>Hora inicio</label>
+        <input id="h_ini" type="time" value="09:00">
+      </div>
+    </div>
+    <div style="margin-top:10px" class="g2">
+      <div class="mc">
+        <div class="mc-lbl">Hora fin estimada</div>
+        <div class="mc-val" id="h_fin">12:00</div>
+        <div class="mc-sub">inicio + tiempo ensayo</div>
+      </div>
+      <div class="mc">
+        <div class="mc-lbl">Verificación temperatura</div>
+        <div class="mc-val" id="verif_t" style="font-size:13px">—</div>
+        <div class="mc-sub">desviación respecto a objetivo</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S3: EVALUACIÓN VISUAL -->
+<section class="section" id="s3">
+  <div class="section-hdr">
+    <div class="section-num" style="background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber)">3</div>
+    <div>
+      <div class="section-title">Evaluación visual — comparación con escala ASTM D-130</div>
+      <div class="section-sub">Seleccionar la clasificación observada en la lámina de cobre</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Escala de corrosión ASTM D-130</div>
+    <div class="corr-scale">
+      <div class="corr-item selected" onclick="selectCorr('1a',this)" style="background:linear-gradient(135deg, #FFB74D 0%, #FFA726 100%)" title="1a - Anaranjado claro">1a</div>
+      <div class="corr-item" onclick="selectCorr('1b',this)" style="background:linear-gradient(135deg, #FF9800 0%, #FB8C00 100%)" title="1b - Anaranjado oscuro">1b</div>
+      <div class="corr-item" onclick="selectCorr('2a',this)" style="background:linear-gradient(135deg, #EF5350 0%, #E53935 100%)" title="2a - Rojo claro">2a</div>
+      <div class="corr-item" onclick="selectCorr('2b',this)" style="background:linear-gradient(135deg, #9FA8DA 0%, #7986CB 100%)" title="2b - Azul suave">2b</div>
+      <div class="corr-item" onclick="selectCorr('2c',this)" style="background:linear-gradient(135deg, #9C27B0 60%, #4CAF50 40%)" title="2c - Colores múltiples">2c</div>
+      <div class="corr-item" onclick="selectCorr('2d',this)" style="background:linear-gradient(135deg, #CFD8DC 0%, #B0BEC5 100%)" title="2d - Plateado">2d</div>
+      <div class="corr-item" onclick="selectCorr('2e',this)" style="background:linear-gradient(135deg, #FFCA28 0%, #FFB300 100%)" title="2e - Bronceado dorado">2e</div>
+      <div class="corr-item" onclick="selectCorr('3a',this)" style="background:linear-gradient(135deg, #5E35B1 0%, #4527A0 100%)" title="3a - Tornasol oscuro">3a</div>
+      <div class="corr-item" onclick="selectCorr('3b',this)" style="background:linear-gradient(135deg, #D32F2F 60%, #388E3C 40%)" title="3b - Múltiples con rojo y verde">3b</div>
+      <div class="corr-item" onclick="selectCorr('4a',this)" style="background:linear-gradient(135deg, #424242 0%, #212121 100%)" title="4a - Negro claro">4a</div>
+      <div class="corr-item" onclick="selectCorr('4b',this)" style="background:#1C1C1C" title="4b - Negro opaco">4b</div>
+      <div class="corr-item" onclick="selectCorr('4c',this)" style="background:#000000;border-color:#333" title="4c - Negro brillante">4c</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Referencia de colores y clasificaciones</div>
+    <div class="color-ref">
+      <div class="color-card">
+        <div class="color-swatch" style="background:linear-gradient(135deg, #FFB74D 0%, #FFA726 100%)"></div>
+        <div class="color-name">Clase 1 — Ligeramente manchada</div>
+        <div class="color-desc">1a: anaranjado claro · 1b: anaranjado oscuro</div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:linear-gradient(135deg, #EF5350 0%, #9FA8DA 100%)"></div>
+        <div class="color-name">Clase 2 — Mancha morada</div>
+        <div class="color-desc">2a-e: rojo claro, azul, múltiples, plateado, dorado</div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:linear-gradient(135deg, #5E35B1 0%, #4527A0 100%)"></div>
+        <div class="color-name">Clase 3 — Mancha oscura</div>
+        <div class="color-desc">3a: tornasol oscuro · 3b: múltiples rojo/verde</div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:linear-gradient(135deg, #424242 0%, #000000 100%)"></div>
+        <div class="color-name">Clase 4 — Corrosión</div>
+        <div class="color-desc">4a-c: negro claro, opaco, brillante</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S4: CLASIFICACIÓN -->
+<section class="section" id="s4">
+  <div class="section-hdr">
+    <div class="section-num" style="background:var(--purple-bg);border:1px solid var(--purple-border);color:var(--purple)">4</div>
+    <div>
+      <div class="section-title">Clasificación y diagnóstico</div>
+      <div class="section-sub">Resultado del ensayo según ASTM D-130</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="g2">
+      <div class="mc" style="background:rgba(163,113,247,.08);border-color:var(--purple-border)">
+        <div class="mc-lbl">Clasificación observada</div>
+        <div class="mc-val" id="clasif" style="font-size:28px;color:var(--purple)">1a</div>
+        <div class="mc-sub">seleccionada en escala visual</div>
+      </div>
+      <div class="mc">
+        <div class="mc-lbl">Designación ASTM D-130</div>
+        <div class="mc-val" id="desig" style="font-size:16px">Ligeramente manchada</div>
+        <div class="mc-sub">descripción cualitativa</div>
+      </div>
+    </div>
+    <div style="margin-top:10px" class="g2">
+      <div class="mc">
+        <div class="mc-lbl">Descripción del color</div>
+        <div class="mc-val" id="desc_color" style="font-size:14px">Anaranjado claro</div>
+      </div>
+      <div class="mc">
+        <div class="mc-lbl">Nivel de corrosividad</div>
+        <div id="nivel_corr" style="margin-top:8px">—</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S5: RESUMEN -->
+<section class="section" id="s5">
+  <div class="section-hdr">
+    <div class="section-num" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text)">5</div>
+    <div>
+      <div class="section-title">Resumen del ensayo</div>
+      <div class="section-sub">Todos los parámetros registrados</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="tbl-wrap">
+      <table class="dt">
+        <thead>
+          <tr>
+            <th style="text-align:left">Parámetro</th>
+            <th>Valor registrado</th>
+            <th>Unidad / Observación</th>
+          </tr>
+        </thead>
+        <tbody id="res_tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  Dashboard de Laboratorio · Ensayo N°3: Corrosión a la Lámina de Cobre ·
+  UMSA Ingeniería Petrolera · Refinación del Petróleo PET-212 ·
+  Norma ASTM D-130
+</footer>
+
+<script>
+const PRESETS = {
+  GAS:{ nom:'Gasolina Especial', proc:'Estación de servicio', S:0.0, T:50 },
+  DIE:{ nom:'Diesel', proc:'Estación de servicio', S:0.0, T:100 },
+  JET:{ nom:'Jet Fuel', proc:'Aeropuerto El Alto', S:0.0, T:100 },
+  S02:{ nom:'Gasolina + 0.2g azufre', proc:'Formulación lab UMSA', S:0.2, T:50 },
+  S05:{ nom:'Gasolina + 0.5g azufre', proc:'Formulación lab UMSA', S:0.5, T:50 },
+  S10:{ nom:'Gasolina + 1.0g azufre', proc:'Formulación lab UMSA', S:1.0, T:50 },
+};
+
+const CLASIF_INFO = {
+  '1a': { desig:'Ligeramente manchada', desc:'Anaranjado claro', nivel:1 },
+  '1b': { desig:'Ligeramente manchada', desc:'Anaranjado oscuro', nivel:1 },
+  '2a': { desig:'Mancha morada', desc:'Rojo claro', nivel:2 },
+  '2b': { desig:'Mancha morada', desc:'Azul suave', nivel:2 },
+  '2c': { desig:'Mancha morada', desc:'Colores múltiples', nivel:2 },
+  '2d': { desig:'Mancha morada', desc:'Plateado', nivel:2 },
+  '2e': { desig:'Mancha morada', desc:'Bronceado dorado', nivel:2 },
+  '3a': { desig:'Mancha oscura', desc:'Tornasol oscuro', nivel:3 },
+  '3b': { desig:'Mancha oscura', desc:'Múltiples con rojo y verde sin gris', nivel:3 },
+  '4a': { desig:'Corrosión', desc:'Negro claro', nivel:4 },
+  '4b': { desig:'Corrosión', desc:'Negro opaco', nivel:4 },
+  '4c': { desig:'Corrosión', desc:'Negro brillante', nivel:4 },
+};
+
+let selectedClass = '1a';
+
+function scrollTo(id){ document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
+
+function loadPreset(k,btn){
+  const p=PRESETS[k];
+  document.getElementById('nom').value=p.nom;
+  document.getElementById('proc').value=p.proc;
+  document.getElementById('azufre').value=p.S.toFixed(1);
+  document.getElementById('t_obj').value=p.T.toString();
+  document.getElementById('t_real').value=p.T.toFixed(1);
+  document.querySelectorAll('.pbtn').forEach(b=>b.classList.remove('act'));
+  btn.classList.add('act');
+  calc();
+}
+
+function selectCorr(cls,el){
+  selectedClass=cls;
+  document.querySelectorAll('.corr-item').forEach(i=>i.classList.remove('selected'));
+  el.classList.add('selected');
+  calc();
+}
+
+function addMinutes(time,mins){
+  const[h,m]=time.split(':').map(Number);
+  const totalMins=h*60+m+mins;
+  const newH=Math.floor(totalMins/60)%24;
+  const newM=totalMins%60;
+  return`${String(newH).padStart(2,'0')}:${String(newM).padStart(2,'0')}`;
+}
+
+function getNivelBadge(n){
+  if(n===1)return'<span class="badge b-ok">Muy baja corrosividad</span>';
+  if(n===2)return'<span class="badge b-warn">Corrosividad moderada</span>';
+  if(n===3)return'<span class="badge b-err">Alta corrosividad</span>';
+  return'<span class="badge b-err">Corrosión severa</span>';
+}
+
+function calc(){
+  const tObj=+document.getElementById('t_obj').value||50;
+  const tReal=+document.getElementById('t_real').value||50;
+  const tiempo=+document.getElementById('tiempo').value||180;
+  const hIni=document.getElementById('h_ini').value||'09:00';
+  const S=+document.getElementById('azufre').value||0;
+
+  const hFin=addMinutes(hIni,tiempo);
+  document.getElementById('h_fin').textContent=hFin;
+
+  const dT=tReal-tObj;
+  const verifT=Math.abs(dT)<2?'<span class="badge b-ok">± '+ dT.toFixed(1)+' °C — dentro tolerancia</span>':'<span class="badge b-warn">± '+dT.toFixed(1)+' °C — fuera tolerancia</span>';
+  document.getElementById('verif_t').innerHTML=verifT;
+
+  const info=CLASIF_INFO[selectedClass];
+  document.getElementById('clasif').textContent=selectedClass;
+  document.getElementById('desig').textContent=info.desig;
+  document.getElementById('desc_color').textContent=info.desc;
+  document.getElementById('nivel_corr').innerHTML=getNivelBadge(info.nivel);
+
+  // Tabla resumen
+  const tbody=document.getElementById('res_tbody');
+  tbody.innerHTML='';
+  const rows=[
+    ['Muestra',document.getElementById('nom').value,'—'],
+    ['Procedencia',document.getElementById('proc').value,'—'],
+    ['Contenido azufre añadido',S.toFixed(1),'g en 10 mL'],
+    ['T objetivo baño maría',tObj.toFixed(0),'°C'],
+    ['T real baño maría',tReal.toFixed(1),'°C'],
+    ['Desviación ΔT',(dT>=0?'+':'')+dT.toFixed(1),'°C'],
+    ['Tiempo inmersión',tiempo,'minutos ('+Math.floor(tiempo/60)+'h '+(tiempo%60)+'min)'],
+    ['Hora inicio',hIni,'—'],
+    ['Hora fin estimada',hFin,'—'],
+    ['Clasificación observada',selectedClass,'ASTM D-130'],
+    ['Designación',info.desig,'—'],
+    ['Descripción color',info.desc,'—'],
+    ['Nivel corrosividad',info.nivel===1?'Muy baja':info.nivel===2?'Moderada':info.nivel===3?'Alta':'Severa','Clase '+info.nivel],
+  ];
+  rows.forEach((r,i)=>{
+    const tr=document.createElement('tr');
+    if(i%2)tr.className='even';
+    tr.innerHTML=`<td class="lbl" style="font-weight:500">${r[0]}</td><td style="color:var(--blue)">${r[1]}</td><td style="color:var(--text3)">${r[2]}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+document.querySelectorAll('.pill').forEach(p=>{
+  p.addEventListener('click',()=>{
+    document.querySelectorAll('.pill').forEach(q=>q.classList.remove('active'));
+    p.classList.add('active');
+  });
+});
+
+document.getElementById('h_ini').addEventListener('input',calc);
+document.getElementById('tiempo').addEventListener('input',calc);
+calc();
+</script>
+</body>
+</html>
